@@ -1,8 +1,10 @@
-
 insert into `PERSON 2` values 
-( 'S1' , 2741 , 'FEMALE' , '2001-01-01' , 'TEH' , 'ALI' ) ,
-( 'S2' , 2742 , 'FEMALE' , '2001-01-02' , 'URM' , 'AMIR' ) ,
-( 'S3' , 2743 , 'MALE' , '2001-01-03' ,  'TBZ' , 'KOROUSH' ),
-( 'S4' , 2744 , 'FEMALE' , '2001-01-03' , 'URM' , 'SAMAN' ) ,
-( 'S5' , 2745 , 'MALE' , '2001-01-05' , 'MHB' , 'ARYA' ),
-( 'S6' , 2746 , 'MALE' , '2001-10-23' , 'KISH' , 'ROHAM' );
+( 'BANFSHE AMIRI' , 2741 , 'FEMALE' , '2001-01-01' , 'TEH' , 'ALI' ) ,
+( 'NILOOFAR AMIRI' , 2742 , 'FEMALE' , '2001-01-02' , 'URM' , 'AMIR' ) ,
+( 'SASAN GOLIZADEH' , 2743 , 'MALE' , '2001-01-03' ,  'TBZ' , 'KOROUSH' ),
+( 'MARYAM MIRZAIE' , 2744 , 'FEMALE' , '2001-01-03' , 'URM' , 'SAMAN' ) ,
+( 'ARMAN IRANI' , 2745 , 'MALE' , '2001-01-05' , 'MHB' , 'ARYA' ),
+( 'SHAHRZAD SALAMI' , 2746 , 'MALE' , '2001-10-23' , 'KISH' , 'ROHAM' );
+
+
+
