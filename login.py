@@ -36,26 +36,38 @@ class LoginForm(QWidget):
         button_student = QPushButton('Student Login')
         button_professor = QPushButton('Professor Login')
         
-        button_student.setStyleSheet("border: 4px solid '#BC006C';" 
-                                     + 'border-radius: 10px;' +
-                                     'font-size: 15px;' 
-                                     + 'color: white;')
-        
-        
+        button_student.setStyleSheet("border: 3px solid '#231942';" 
+                                     + 'border-radius: 10px;' 
+                                     + 'font-size: 15px;' 
+                                     + 'color: white;' 
+                                     + 'padding: 25x 0;' 
+                                     + 'margin: 15px 20px;}'
+                                     + "*:hover{background: '#5E548E';}")
+        button_professor.setStyleSheet("border: 3px solid '#231942';" 
+                                     + 'border-radius: 10px;' 
+                                     + 'font-size: 15px;' 
+                                     + 'color: white;' 
+                                     + 'padding: 25x 0;' 
+                                     + 'margin: 15px 20px;}'
+                                     + "*:hover{background: '#5E548E';}")
+        button_admin.setStyleSheet("border: 3px solid '#231942';" 
+                                     + 'border-radius: 10px;' 
+                                     + 'font-size: 15px;' 
+                                     + 'color: white;' 
+                                     + 'padding: 25x 0;' 
+                                     + 'margin: 15px 20px;}'
+                                     + "*:hover{background: '#5E548E';}")
         button_admin.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         button_student.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         button_professor.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
         button_admin.clicked.connect(self.check_admin_password)
-        button_admin.setStyleSheet("background-color: #231941; color: white;")
         layout.addWidget(button_admin, 2, 0)
 
         button_student.clicked.connect(self.check_student_password)
-        #button_student.setStyleSheet("background-color: #231942; color: white;")
         layout.addWidget(button_student, 2, 1)
 
         button_professor.clicked.connect(self.check_professor_password)
-        button_professor.setStyleSheet("background-color: #231942; color: white;")
         layout.addWidget(button_professor, 2, 2)
 
         layout.setRowMinimumHeight(2, 75)
@@ -156,3 +168,4 @@ if __name__ == '__main__':
     form = LoginForm()
     form.show()
     sys.exit(app.exec_())
+    
