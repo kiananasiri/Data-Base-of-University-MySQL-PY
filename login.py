@@ -1,12 +1,15 @@
 import sys
 import qtpy
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QMessageBox , QVBoxLayout, QStackedWidget
-from PyQt5.QtWidgets import  QTableWidget, QTableWidgetItem , QSizePolicy , QHeaderView
+from PyQt5.QtWidgets import  QTableWidget, QTableWidgetItem , QSizePolicy , QHeaderView , QHBoxLayout
 from PyQt5.QtGui import QPalette, QColor, QCursor
 from PyQt5.QtGui import QPalette, QColor , QCursor
 from PyQt5 import QtCore 
+from PyQt5.QtCore import Qt
 import mysql.connector
 from mysql.connector import Error
+
+
 
 class LoginForm(QWidget):
     def __init__(self):
@@ -106,7 +109,7 @@ class LoginForm(QWidget):
                 host='localhost',
                 database='mydb',
                 user='root',
-                password='de1u1ub*By'
+                password='bonjour1'
             )
             if connection.is_connected():
                 return connection
@@ -117,34 +120,24 @@ class LoginForm(QWidget):
             return None
 
     def check_admin_password(self):
-        """connection = self.create_connection()
-        if connection:"""
-            #cursor = connection.cursor()
-            #query = "SELECT id FROM admin WHERE username = %s"
-            #cursor.execute(query, (self.lineEdit_username.text(),))
-        username = 'admin'
+        connection = self.create_connection()
+        if connection:
+            cursor = connection.cursor()
+            query = "SELECT id FROM admin WHERE username = %s"
+            cursor.execute(query, (self.lineEdit_username.text(),))
+            result = cursor.fetchone()
+            connection.close()
 
-        msg = QMessageBox()
-        if username == self.lineEdit_username.text() and self.lineEdit_password.text() == '11':
+            msg = QMessageBox()
+            if result:
                 msg.setText('Admin Login Successful')
                 msg.exec_()
                 # Perform further actions after successful login
-                self.show_admin_page()
+                self.login_action('admin', result[0])
                 
-        else:
+            else:
                 msg.setText('Incorrect Admin Username')
                 msg.exec_()
-
-    def show_admin_page():
-         print('ehhlo')
-
-
-
-
-
-
-
-    
 
     def check_student_password(self):
         connection = self.create_connection()
@@ -247,14 +240,200 @@ class LoginForm(QWidget):
 
     # Set the size policy for the table
         table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        table.setMaximumSize(580, table.verticalHeader().defaultSectionSize() + 50)
+        table.setMaximumSize(610, table.verticalHeader().defaultSectionSize() + 60)
+        
+# buttons book nad sec stsec hosetly 
+
+        # Add buttons to the student page
+        table_widget = QWidget()
+        table_layout = QVBoxLayout(table_widget)
+        table_layout.addWidget(table)
+        table_layout.setAlignment(QtCore.Qt.AlignCenter)  # Align table in the center
+        layout.addWidget(table_widget, alignment=Qt.AlignCenter)
 
         layout.addWidget(table)
+
+        # Add buttons to the student page
+        buttonstu_section = QPushButton('SECTION')
+        buttonstu_book = QPushButton('BOOK')
+        buttonstu_another = QPushButton('ANOTHER')
+
+        buttonstu_section.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        buttonstu_book.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        buttonstu_another.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(buttonstu_section)
+        button_layout.addWidget(buttonstu_book)
+        button_layout.addWidget(buttonstu_another)
+        
+        buttonstu_book.setStyleSheet("QPushButton {"
+                             "    border: 3px solid #231942;"
+                             "    border-radius: 10px;"
+                             "    font-size: 15px;"
+                             "    color: white;"
+                             "    padding: 10px 20px;"
+                             "    margin: 15px 20px;"
+                             "}"
+                             "QPushButton:hover {"
+                             "    background-color: #5E548E;"
+                             "}"
+                             "QPushButton:pressed {"
+                             "    background-color: #231942;"
+                             "    border-color: #231942;"
+                             "}")
+        buttonstu_section.setStyleSheet("QPushButton {"
+                             "    border: 3px solid #231942;"
+                             "    border-radius: 10px;"
+                             "    font-size: 15px;"
+                             "    color: white;"
+                             "    padding: 10px 20px;"
+                             "    margin: 15px 20px;"
+                             "}"
+                             "QPushButton:hover {"
+                             "    background-color: #5E548E;"
+                             "}"
+                             "QPushButton:pressed {"
+                             "    background-color: #231942;"
+                             "    border-color: #231942;"
+                             "}")
+        buttonstu_book.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+
+        # Align buttons to the bottom-center
+        button_widget = QWidget()
+        button_widget.setLayout(button_layout)
+        layout.addWidget(button_widget, alignment=QtCore.Qt.AlignBottom)
+        
+        buttonstu_section.clicked.connect(self.show_section_data)
+        buttonstu_book.clicked.connect(lambda: self.show_borrowed_books(result[0]))  # Assuming result[0] is the student ID
+
+    # Add student page widget to stacked widget
         self.stacked_widget.addWidget(user_page)
         self.stacked_widget.setCurrentWidget(user_page)
-        
-        
-        
+
+    
+    
+    def show_section_data(self):
+        try:
+            connection = mysql.connector.connect(
+                host='localhost',
+                database='mydb',
+                user='root',
+                password='bonjour1'
+            )
+
+            
+            if connection:
+                cursor = connection.cursor()
+                query = """
+                    SELECT STSEC.* , SECTION.*
+                    FROM STSEC
+                    JOIN SECTION ON STSEC.SECTION_SECID = SECTION.SECID
+                    WHERE STSEC.STUDENT_ENROLLMENT_STID = %s
+                """
+                cursor.execute(query, (self.lineEdit_username.text(),))
+                results = cursor.fetchall()
+
+                # Close the database connection
+                connection.close()
+                
+
+                # Create a new widget to display section data
+                section_page = QWidget()
+                layout = QVBoxLayout(section_page)
+                
+                title = QLabel("Section Page")
+                title.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
+                title.setStyleSheet(
+        '''
+        font-size: 30px;
+        color: purple;
+        border: 2px solid black;
+        background-color: #FFC0CB;  /* light pink background color */
+        padding: 10px;
+        '''
+    )
+                title.setMaximumSize(700 , 80)
+                layout.addWidget(title)
+                section_page.setLayout(layout)
+                # Add a table to display the data
+                section_table = QTableWidget()
+                section_table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
+
+                # Adjusting the cell font
+                section_table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
+
+                if results:
+                    section_table.setRowCount(len(results))
+                    section_table.setColumnCount(len(results[0]))
+                    section_table.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
+
+                    # Fill the table with data
+                    for row_index, row_data in enumerate(results):
+                        for col_index, col_value in enumerate(row_data):
+                            section_table.setItem(row_index, col_index, QTableWidgetItem(str(col_value)))
+
+                    # Resize the columns to content
+                    section_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
+                    # Set the size policy for the table
+                    section_table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    section_table.setMaximumSize(1190, section_table.verticalHeader().defaultSectionSize() * len(results) + 50)
+
+                else:
+                    # Handle case where no data was found
+                    msg = QMessageBox()
+                    msg.setText('No section data found for the student.')
+                    msg.exec_()
+
+                layout.addWidget(section_table)
+                self.stacked_widget.addWidget(section_page)
+                self.stacked_widget.setCurrentWidget(section_page)
+
+               
+                
+
+        except Error as e:
+            print(f"Error retrieving data: {e}")
+            # Handle error, show message box or log error
+            
+    def show_borrowed_books(self, student_id):
+        connection = self.create_connection()
+        if connection:
+            cursor = connection.cursor()
+            query = """
+                SELECT BOOK.NAME , LIBRARY_has_BOOK.BOOK_ISBN , BORROWS.TAKE_DATE, BORROWS.RETURN_DATE
+                FROM BORROWS
+                JOIN LIBRARY_has_BOOK ON BORROWS.LIBRARY_has_BOOK_BOOKID = LIBRARY_has_BOOK.BOOKID
+                JOIN BOOK on LIBRARY_has_BOOK.BOOK_ISBN = BOOK.ISBN
+                WHERE BORROWS.STUDENT_ENROLLMENT_STID = %s
+            """
+            cursor.execute(query, (student_id,))
+            borrowed_books = cursor.fetchall()
+            connection.close()
+
+            # Display the borrowed books in a new table
+            borrowed_books_page = QWidget()
+            layout = QVBoxLayout(borrowed_books_page)
+
+            borrowed_books_table = QTableWidget()
+            borrowed_books_table.setStyleSheet("background-color: #9F86C0; border: 2px solid #231942;")
+            borrowed_books_table.setRowCount(len(borrowed_books))
+            borrowed_books_table.setColumnCount(4)
+            borrowed_books_table.setHorizontalHeaderLabels(["NAME", "BOOKID" , "BORROW DATE", "RETURN DATE"])
+
+            # Fill the table with borrowed books data
+            for row_index, row_data in enumerate(borrowed_books):
+                for col_index, col_value in enumerate(row_data):
+                    borrowed_books_table.setItem(row_index, col_index, QTableWidgetItem(str(col_value)))
+
+            borrowed_books_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+            borrowed_books_table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            borrowed_books_table.setMaximumSize(800, 400)  # Adjust as needed
+
+            layout.addWidget(borrowed_books_table)
+            self.stacked_widget.addWidget(borrowed_books_page)
+            self.stacked_widget.setCurrentWidget(borrowed_books_page)     
         
         
         
@@ -306,4 +485,3 @@ if __name__ == '__main__':
     form = LoginForm()
     form.show()
     sys.exit(app.exec_())
-
