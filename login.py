@@ -1,6 +1,8 @@
 import sys
 import qtpy
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QMessageBox , QVBoxLayout, QStackedWidget
+from PyQt5.QtWidgets import  QTableWidget, QTableWidgetItem , QSizePolicy , QHeaderView
+from PyQt5.QtGui import QPalette, QColor, QCursor
 from PyQt5.QtGui import QPalette, QColor , QCursor
 from PyQt5 import QtCore 
 import mysql.connector
@@ -10,7 +12,7 @@ class LoginForm(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Login Form')
-        self.resize(500, 120)
+        self.resize(2560, 1600)
         
         # Set the background color to lilac
         palette = QPalette()
@@ -187,34 +189,103 @@ class LoginForm(QWidget):
             connection.close()
 
             if result:
-                # Create a new widget to display user data
-                user_page = QWidget()
-                layout = QVBoxLayout(user_page)
-
-                # Iterate over result columns and display data
-                for col_index, col_value in enumerate(result):
-                    label = QLabel(f"{cursor.description[col_index][0]}: {col_value}")
-                    layout.addWidget(label)
-
-                self.stacked_widget.addWidget(user_page)
-                self.stacked_widget.setCurrentWidget(user_page)
+                self.student_page(cursor, result) if user_type == 'STUDENT' else self.professor_page(cursor, result)
             else:
                 # Handle case where no data was found (though it shouldn't happen if login is successful)
                 msg = QMessageBox()
                 msg.setText('No data found for user ID.')
                 msg.exec_()
+            
         else:
             # Handle case where database connection failed
             msg = QMessageBox()
             msg.setText('Database connection failed.')
             msg.exec_()
 
+    def student_page(self, cursor, result):
+        # Create a new widget to display user data
+        user_page = QWidget()
+        layout = QVBoxLayout(user_page)
 
+        # Add a table to display the data
+        table = QTableWidget()
+        table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
+
+        # Adjusting the cell font
+        table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
+
+        table.setHorizontalHeaderLabels(["STUDENT ID", "NAME", "MAJOR", "TOTAL PASSED CREDIT", "LEVEL", "TERM", "STATE"])
+    
+        table.setRowCount(1)
+        table.setColumnCount(len(result))
+        table.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
+
+        # Fill the table with data
+        for col_index, col_value in enumerate(result):
+            table.setItem(0, col_index, QTableWidgetItem(str(col_value)))
+            
+    # Resize the columns to content
+        table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
+    # Set the size policy for the table
+        table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        table.setMaximumSize(580, table.verticalHeader().defaultSectionSize() + 50)
+
+        layout.addWidget(table)
+        self.stacked_widget.addWidget(user_page)
+        self.stacked_widget.setCurrentWidget(user_page)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+    def professor_page(self, cursor, result):
+         # Create a new widget to display user data
+        user_page = QWidget()
+        layout = QVBoxLayout(user_page)
+
+        # Add a table to display the data
+        table = QTableWidget()
+        table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
+
+        # Adjusting the cell font
+        table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
+
+        table.setHorizontalHeaderLabels(["PROF_ID" , "NAME" ,"SALARY" , "DEPARTMENT" , "PHONE"])
+    
+        table.setRowCount(1)
+        table.setColumnCount(len(result)-3)
+        table.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
+
+        # Fill the table with data
+        for col_index, col_value in enumerate(result):
+            table.setItem(0, col_index, QTableWidgetItem(str(col_value)))
+            
+    # Resize the columns to content
+        table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
+    # Set the size policy for the table
+        table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        table.setMaximumSize(620, table.verticalHeader().defaultSectionSize() + 50)
+
+        layout.addWidget(table)
+        self.stacked_widget.addWidget(user_page)
+        self.stacked_widget.setCurrentWidget(user_page)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     form = LoginForm()
     form.show()
     sys.exit(app.exec_())
-
 
