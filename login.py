@@ -12,7 +12,7 @@ class LoginForm(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Login Form')
-        self.resize(2560, 1600)
+        self.setFixedSize(1380, 650)
         
         # Set the background color to lilac
         palette = QPalette()
@@ -30,19 +30,27 @@ class LoginForm(QWidget):
         label_name = QLabel('<font size="4"> Username </font>')
         self.lineEdit_username = QLineEdit()
         self.lineEdit_username.setPlaceholderText('Please enter your username')
+        label_name.setFixedWidth(200)
+        label_name.setAlignment(QtCore.Qt.AlignHCenter)
         layout.addWidget(label_name, 0, 0)
-        layout.addWidget(self.lineEdit_username, 0, 1)
+        layout.addWidget(self.lineEdit_username, 0, 1, 1, 3)
 
         label_password = QLabel('<font size="4"> Password </font>')
         self.lineEdit_password = QLineEdit()
         self.lineEdit_password.setPlaceholderText('Please enter your password')
         self.lineEdit_password.setEchoMode(QLineEdit.Password)
+        label_password.setFixedWidth(200)
+        label_password.setAlignment(QtCore.Qt.AlignHCenter)
         layout.addWidget(label_password, 1, 0)
-        layout.addWidget(self.lineEdit_password, 1, 1)
+        layout.addWidget(self.lineEdit_password, 1, 1, 1, 3)
 
         button_admin = QPushButton('Admin Login')
         button_student = QPushButton('Student Login')
         button_professor = QPushButton('Professor Login')
+
+        button_admin.setFixedWidth(170)
+        button_student.setFixedWidth(170)
+        button_professor.setFixedWidth(170)
         
         button_student.setStyleSheet("border: 3px solid '#231942';" 
                                      + 'border-radius: 10px;' 
@@ -70,13 +78,13 @@ class LoginForm(QWidget):
         button_professor.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
         button_admin.clicked.connect(self.check_admin_password)
-        layout.addWidget(button_admin, 2, 0)
+        layout.addWidget(button_admin, 2, 1)
 
         button_student.clicked.connect(self.check_student_password)
-        layout.addWidget(button_student, 2, 1)
+        layout.addWidget(button_student, 2, 2)
 
         button_professor.clicked.connect(self.check_professor_password)
-        layout.addWidget(button_professor, 2, 2)
+        layout.addWidget(button_professor, 2, 3)
 
         layout.setRowMinimumHeight(2, 75)
         
@@ -98,7 +106,7 @@ class LoginForm(QWidget):
                 host='localhost',
                 database='mydb',
                 user='root',
-                password='bonjour1'
+                password='de1u1ub*By'
             )
             if connection.is_connected():
                 return connection
