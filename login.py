@@ -120,24 +120,18 @@ class LoginForm(QWidget):
             return None
 
     def check_admin_password(self):
-        connection = self.create_connection()
-        if connection:
-            cursor = connection.cursor()
-            query = "SELECT id FROM admin WHERE username = %s"
-            cursor.execute(query, (self.lineEdit_username.text(),))
-            result = cursor.fetchone()
-            connection.close()
+         username = 'admin'
+        password = '11'  # Replace with actual password retrieval logic
 
+        if username == self.lineEdit_username.text() and password == self.lineEdit_password.text():
             msg = QMessageBox()
-            if result:
-                msg.setText('Admin Login Successful')
-                msg.exec_()
-                # Perform further actions after successful login
-                self.login_action('admin', result[0])
-                
-            else:
-                msg.setText('Incorrect Admin Username')
-                msg.exec_()
+            msg.setText('Admin Login Successful')
+            msg.exec_()
+            self.show_admin_page()  # Call the function to show admin page
+        else:
+            msg = QMessageBox()
+            msg.setText('Incorrect Admin Username or Password')
+            msg.exec_()
 
     def check_student_password(self):
         connection = self.create_connection()
