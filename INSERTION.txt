@@ -72,7 +72,13 @@ INSERT INTO BOOK VALUES
 ( 1299 , 'DB' , 'PROFFOSSOR RANKUHU' , 'UT' ,3 ),
 ( 1288 , 'DEITEL C' , 'DEITEL' , 'SU' , 6),
 ( 1277 , 'THOMAS MATH' , 'THOMAS' ,'SU' ,7),
-( 1266 , 'ALGORITHMS' , 'CLRS' , 'SU' , 5);
+( 1266 , 'ALGORITHMS' , 'CLRS' , 'SU' , 5),
+( 1211 , 'CHESS' , 'BURGOV ALI' , 'RPUB' , 2),
+( 1222 , 'Database System Concepts' , 'AVI SILBERSCHTZ' , 'MC-HILL' , 7),
+( 1233 , 'LINEAR ALGEBRA' , 'HOFFMAN' , 'SU' , 2),
+( 1244 , 'HANDS ON ML' , 'Geron Aurelien' , 'SU' , 1),
+( 1255 , 'Computer Architecture and Organization' , 'MORIS MANO' , 'SU' , 5),
+( 1200 , 'Advanced Digital System Design using SoC FPGAs' , 'Ross K. Snider' , 'SU' , 1);
 
 INSERT INTO LIBRARY VALUES
 ( 4425 , 'CELIB' , 442),
