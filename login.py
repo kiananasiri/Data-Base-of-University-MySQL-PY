@@ -100,24 +100,24 @@ def create_connection():
             print(f"Error connecting to MySQL: {e}")
             return None
 
-def execute_query( query):
-        conn = create_connection()
-        if conn:
-            try:
-                cursor = conn.cursor()
-                cursor.execute(query)
-                rows = cursor.fetchall()
-                conn.close()
-                return rows
-            except Error as e:
-                print(f"Error executing query: {e}")
-                conn.close()
-                return []
-        else:
+def execute_query(query):
+    conn = create_connection()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            conn.close()
+            return rows
+        except Error as e:
+            print(f"Error executing query: {e}")
+            conn.close()
             return []
+    else:
+        return []
 
 def Q1():
-        query = '''
+    query = '''
         SELECT student_enrollment_stid FROM mydb.stsec
         WHERE section_secid IN (SELECT secid FROM mydb.section
                                 WHERE year = YEAR(CURRENT_DATE()) AND semester = CASE 
@@ -125,9 +125,69 @@ def Q1():
                                 ELSE 2
                                 END)
         '''
-        rows = execute_query(query)
-        for row in rows:
-            print(row[0])
+    rows = execute_query(query)
+    for row in rows:
+        print(row[0])
+            
+    rows = execute_query(query)
+    
+    # Create a new widget to display query results
+    result_page = QWidget()
+    layout = QVBoxLayout(result_page)
+    
+    title = QLabel("Query 1 Result")
+    title.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
+    title.setStyleSheet(
+        '''
+        font-size: 30px;
+        color: purple;
+        border: 2px solid black;
+        background-color: #FFC0CB;  /* light pink background color */
+        padding: 10px;
+        '''
+    )
+    layout.addWidget(title)
+    
+    # Add a table to display the query results
+    table = QTableWidget()
+    table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
+    
+    # Adjusting the cell font
+    table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
+    
+    if rows:
+        table.setRowCount(len(rows))
+        table.setColumnCount(1)  # Assuming only one column in the result for Q1
+        
+        # Fill the table with data
+        for row_index, row_data in enumerate(rows):
+            table.setItem(row_index, 0, QTableWidgetItem(str(row_data[0])))
+        
+        # Resize the columns to content
+        table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        
+        # Set the size policy for the table
+        table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        table.setMaximumSize(600, table.verticalHeader().defaultSectionSize() * len(rows) + 50)
+        
+        layout.addWidget(table)
+    else:
+        # Handle case where no data was found
+        no_data_label = QLabel("No data found for Query 1.")
+        no_data_label.setAlignment(QtCore.Qt.AlignCenter)
+        layout.addWidget(no_data_label)
+    
+    # Add the widget to stacked widget or display directly
+    # You can add this widget to QStackedWidget or directly set as current widget
+    # self.stacked_widget.addWidget(result_page)
+    # self.stacked_widget.setCurrentWidget(result_page)
+    
+    result_page.setLayout(layout)
+    result_page.show()  # Show the result page
+
+    # Alternatively, if using QStackedWidget
+    # self.stacked_widget.addWidget(result_page)
+    # self.stacked_widget.setCurrentWidget(result_page)
 
 def Q2():
         query = '''
@@ -144,16 +204,75 @@ def Q2():
             print(row[0])
 
 def Q3():
-        query = '''
+    query = '''
         SELECT stsec.student_enrollment_stid, (SUM(stsec.grade * course.credit)/SUM(course.credit)) AS 'weighted average'
         FROM course
         INNER JOIN section ON course.coid = section.course_coid
         INNER JOIN stsec ON section.secid = stsec.section_secid
         GROUP BY stsec.student_enrollment_stid
         '''
-        rows = execute_query(query)
-        for row in rows:
+    rows = execute_query(query)
+    for row in rows:
             print(row)
+    
+    # Create a new widget to display query results
+    result_page = QWidget()
+    layout = QVBoxLayout(result_page)
+    
+    title = QLabel("Query 3 Result")
+    title.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
+    title.setStyleSheet(
+        '''
+        font-size: 30px;
+        color: purple;
+        border: 2px solid black;
+        background-color: #FFC0CB;  /* light pink background color */
+        padding: 10px;
+        '''
+    )
+    layout.addWidget(title)
+    
+    # Add a table to display the query results
+    table = QTableWidget()
+    table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
+    
+    # Adjusting the cell font
+    table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
+    
+    rows = execute_query(query)
+    if rows:
+        show_results_page(rows)  # Call function to show results
+    else:
+        print("No results found.")  # Handle case where no rows are returned
+
+def show_results_page(rows):
+    # Create a new widget to display the results
+    results_page = QWidget()
+    layout = QVBoxLayout(results_page)
+
+    # Add widgets to display the results (e.g., QLabel, QTableWidget, etc.)
+    result_label = QLabel("Results for Q3:")
+    layout.addWidget(result_label)
+
+    # Example: Display results in a QTableWidget
+    table = QTableWidget()
+    table.setColumnCount(1)  # Adjust column count as per your data
+    table.setRowCount(len(rows))
+    table.setHorizontalHeaderLabels(["Student Enrollment ID"])  # Adjust header labels
+
+    for row_index, row in enumerate(rows):
+        table.setItem(row_index, 0, QTableWidgetItem(str(row[0])))
+
+    layout.addWidget(table)
+
+    # Add the layout to the widget
+    results_page.setLayout(layout)
+
+    # Add results_page to stacked widget and set as current widget
+    form.stacked_widget.addWidget(results_page)
+    form.stacked_widget.setCurrentWidget(results_page)
+    # self.stacked_widget.setCurrentWidget(result_page)
+            
 
 def Q4():
         query = '''
