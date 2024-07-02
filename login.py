@@ -9,17 +9,6 @@ from PyQt5.QtCore import Qt
 import mysql.connector
 from mysql.connector import Error
 
-import sys
-import qtpy
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QMessageBox , QVBoxLayout, QStackedWidget
-from PyQt5.QtWidgets import  QTableWidget, QTableWidgetItem , QSizePolicy , QHeaderView , QHBoxLayout
-from PyQt5.QtGui import QPalette, QColor, QCursor
-from PyQt5.QtGui import QPalette, QColor , QCursor
-from PyQt5 import QtCore 
-from PyQt5.QtCore import Qt
-import mysql.connector
-from mysql.connector import Error
-
 
 def create_admin_page():
     admin_page = QWidget()
@@ -48,25 +37,25 @@ def create_admin_page():
 
     b1 = button_maker("Q1")
     grid.addWidget(b1, 1, 0)
-    b1.clicked.connect(lambda: queries.Q1())
+    b1.clicked.connect(lambda: Q1())
     b2 = button_maker("Q2")
     grid.addWidget(b2, 2, 1)
-    b2.clicked.connect(lambda: queries.Q2())
+    b2.clicked.connect(lambda: Q2())
     b3 = button_maker("Q3")
     grid.addWidget(b3, 1, 2)
-    b3.clicked.connect(lambda: queries.Q3())
+    b3.clicked.connect(lambda: Q3())
     b4 = button_maker("Q4")
     grid.addWidget(b4, 2, 3)
-    b4.clicked.connect(lambda: queries.Q4())
+    b4.clicked.connect(lambda: Q4())
     b5 = button_maker("Q5")
     grid.addWidget(b5, 1, 4)
-    b5.clicked.connect(lambda: queries.Q5())
+    b5.clicked.connect(lambda: Q5())
     b6 = button_maker("Q6")
     grid.addWidget(b6, 2, 5)
-    b6.clicked.connect(lambda: queries.Q6())
+    b6.clicked.connect(lambda: Q6())
     b7 = button_maker("Q7")
     grid.addWidget(b7, 1, 6)
-    b7.clicked.connect(lambda: queries.Q7())
+    b7.clicked.connect(lambda: Q7())
 
     return admin_page
 
@@ -94,6 +83,130 @@ def button_maker(txt):
         '''
     )
     return b
+
+def create_connection():
+        try:
+            conn = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="bonjour1",
+                database="mydb"
+            )
+            if conn.is_connected():
+                return conn
+        except Error as e:
+            print(f"Error connecting to MySQL: {e}")
+            return None
+
+def execute_query( query):
+        conn = create_connection()
+        if conn:
+            try:
+                cursor = conn.cursor()
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                conn.close()
+                return rows
+            except Error as e:
+                print(f"Error executing query: {e}")
+                conn.close()
+                return []
+        else:
+            return []
+
+def Q1():
+        query = '''
+        SELECT student_enrollment_stid FROM mydb.stsec
+        WHERE section_secid IN (SELECT secid FROM mydb.section
+                                WHERE year = YEAR(CURRENT_DATE()) AND semester = CASE 
+                                WHEN MONTH(CURRENT_DATE()) IN (9, 10, 11, 12, 1) THEN 1
+                                ELSE 2
+                                END)
+        '''
+        rows = execute_query(query)
+        for row in rows:
+            print(row[0])
+
+def Q2():
+        query = '''
+        SELECT course_coid FROM mydb.section AS s
+        WHERE year = YEAR(CURRENT_DATE()) AND semester = CASE 
+                                WHEN MONTH(CURRENT_DATE()) IN (9, 10, 11, 12, 1) THEN 1
+                                ELSE 2
+                                END
+        AND 5 < (SELECT COUNT(student_enrollment_stid) FROM mydb.stsec
+                WHERE stsec.section_secid = s.secid)
+        '''
+        rows = execute_query(query)
+        for row in rows:
+            print(row[0])
+
+def Q3():
+        query = '''
+        SELECT stsec.student_enrollment_stid, (SUM(stsec.grade * course.credit)/SUM(course.credit)) AS 'weighted average'
+        FROM course
+        INNER JOIN section ON course.coid = section.course_coid
+        INNER JOIN stsec ON section.secid = stsec.section_secid
+        GROUP BY stsec.student_enrollment_stid
+        '''
+        rows = execute_query(query)
+        for row in rows:
+            print(row)
+
+def Q4():
+        query = '''
+        SELECT * FROM professor AS p
+        WHERE 70 < (SELECT SUM(credit) FROM course
+                    WHERE coid IN (SELECT course_coid FROM section
+                                    WHERE section.professor_prof_id = p.prof_id))
+        '''
+        rows = execute_query(query)
+        for row in rows:
+            print(row)
+
+def Q5():
+        query = '''
+        SELECT book.name FROM book
+        WHERE isbn IN (SELECT book_isbn FROM library_has_book AS lhb
+                        WHERE 4 < (SELECT COUNT(DISTINCT student_enrollment_stid) FROM borrows
+                                    WHERE borrows.library_has_book_bookid = lhb.bookid))
+        '''
+        rows = execute_query(query)
+        for row in rows:
+            print(row)
+
+def Q6():
+        query = '''
+        SELECT professor_prof_id, GROUP_CONCAT(schedule SEPARATOR "\\n") FROM section AS s
+        WHERE year = YEAR(CURRENT_DATE()) AND semester = CASE 
+                                WHEN MONTH(CURRENT_DATE()) IN (9, 10, 11, 12, 1) THEN 1
+                                ELSE 2
+                                END
+        AND 20 < (SELECT COUNT(student_enrollment_stid) FROM stsec
+                    WHERE s.secid = stsec.section_secid)
+        AND 3 <= (SELECT COUNT(course_coid) FROM section
+                    WHERE year = YEAR(CURRENT_DATE()) AND semester = CASE 
+                                WHEN MONTH(CURRENT_DATE()) IN (9, 10, 11, 12, 1) THEN 1
+                                ELSE 2
+                                END
+                    AND section.professor_prof_id = s.professor_prof_id)
+        GROUP BY professor_prof_id
+        '''
+        rows = execute_query(query)
+        for row in rows:
+            print(row)
+
+def Q7():
+        query = '''
+        SELECT * FROM student
+        WHERE enrollment_stid NOT IN (SELECT student_enrollment_stid FROM stsec)
+        '''
+        rows = execute_query(query)
+        for row in rows:
+            print(row)
+
+
+
 
 
 class LoginForm(QWidget):
