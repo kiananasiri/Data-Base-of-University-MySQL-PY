@@ -1,13 +1,15 @@
 import sys
 import qtpy
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QMessageBox , QVBoxLayout, QStackedWidget
-from PyQt5.QtWidgets import  QTableWidget, QTableWidgetItem , QSizePolicy , QHeaderView , QHBoxLayout
+from PyQt5.QtWidgets import  QTableWidget, QTableWidgetItem , QSizePolicy , QHeaderView , QHBoxLayout ,   QGraphicsDropShadowEffect
 from PyQt5.QtGui import QPalette, QColor, QCursor
-from PyQt5.QtGui import QPalette, QColor , QCursor
+from PyQt5.QtGui import QPalette, QColor , QCursor , QFont, QPixmap , QBitmap , QPainter , QPainterPath
+
 from PyQt5 import QtCore 
 from PyQt5.QtCore import Qt
 import mysql.connector
 from mysql.connector import Error
+
 
 
 def create_admin_page():
@@ -204,11 +206,7 @@ def Q7():
         rows = execute_query(query)
         for row in rows:
             print(row)
-
-
-
-
-
+            
 class LoginForm(QWidget):
     def __init__(self):
         super().__init__()
@@ -318,7 +316,8 @@ class LoginForm(QWidget):
             return None
 
     def check_admin_password(self):
-         username = 'admin'
+
+        username = 'admin'
         password = '11'  # Replace with actual password retrieval logic
 
         if username == self.lineEdit_username.text() and password == self.lineEdit_password.text():
@@ -331,6 +330,12 @@ class LoginForm(QWidget):
             msg.setText('Incorrect Admin Username or Password')
             msg.exec_()
 
+    def show_admin_page(self):
+        admin_page = create_admin_page()
+        self.stacked_widget.addWidget(admin_page)
+        self.stacked_widget.setCurrentWidget(admin_page)
+        
+        
     def check_student_password(self):
         connection = self.create_connection()
         if connection:
@@ -410,29 +415,55 @@ class LoginForm(QWidget):
         user_page = QWidget()
         layout = QVBoxLayout(user_page)
 
+    
+        # Create a drop shadow effect
+        shadow = QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(15)
+        shadow.setOffset(5, 5)
+        shadow.setColor(QColor(136, 136, 136))  # Gray shadow color
+
+        image_label = QLabel()
+        pixmap = QPixmap("/Users/kiananasiri/Desktop/welcomestu.png") 
+        image_label.setPixmap(pixmap)
+        image_label.setAlignment(Qt.AlignCenter)
+        size = 200  
+        scaled_pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+        image_label.setPixmap(scaled_pixmap)
+ 
+        layout.addWidget(image_label)
+        self.setLayout(layout)
+
+
+
         # Add a table to display the data
         table = QTableWidget()
-        table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
+        table.setStyleSheet("background-color: #d3d3d3 ; border: 2px solid #231942;")
 
+        
+        
+        
+        
         # Adjusting the cell font
-        table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
+        table.horizontalHeader().setStyleSheet("font-size: 10px; color: black;")
 
-        table.setHorizontalHeaderLabels(["STUDENT ID", "NAME", "MAJOR", "TOTAL PASSED CREDIT", "LEVEL", "TERM", "STATE"])
+        table.setHorizontalHeaderLabels(["STUDENTID", "NAME", "MAJOR", "TOTAL PASSED CREDIT", "LEVEL", "TERM", "STATE"])
     
         table.setRowCount(1)
         table.setColumnCount(len(result))
         table.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
-
+        row_label = "STUDENT INFO"
+        table.setVerticalHeaderLabels([row_label])
         # Fill the table with data
         for col_index, col_value in enumerate(result):
             table.setItem(0, col_index, QTableWidgetItem(str(col_value)))
             
+        
     # Resize the columns to content
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     # Set the size policy for the table
         table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        table.setMaximumSize(610, table.verticalHeader().defaultSectionSize() + 60)
+        table.setMaximumSize(600 , table.verticalHeader().defaultSectionSize() + 20)
         
 # buttons book nad sec stsec hosetly 
 
@@ -440,7 +471,7 @@ class LoginForm(QWidget):
         table_widget = QWidget()
         table_layout = QVBoxLayout(table_widget)
         table_layout.addWidget(table)
-        table_layout.setAlignment(QtCore.Qt.AlignCenter)  # Align table in the center
+        table_layout.setAlignment(QtCore.Qt.AlignCenter)  
         layout.addWidget(table_widget, alignment=Qt.AlignCenter)
 
         layout.addWidget(table)
@@ -677,3 +708,4 @@ if __name__ == '__main__':
     form = LoginForm()
     form.show()
     sys.exit(app.exec_())
+
