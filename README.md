@@ -1,11 +1,4 @@
 # Data-Base-of-University-SQL-PY
----
-title: University Data
-date: 2023-06-01
-spoiler: 
-categories: ["creativity", "all-profile"]
-githubUsername: 'adamalston'
----
 
 ---
 title: University Data Base 
