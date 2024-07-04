@@ -1,19 +1,8 @@
 # Data-Base-of-University-SQL-PY
----
-title: University Data
-date: 2023-06-01
-spoiler: 
-categories: ["creativity", "all-profile"]
-githubUsername: 'adamalston'
----
 
----
-title: University Data Base 
-date: 2023-06-01
-spoiler: University Data Base using MYSQLserver and python programming
-categories: ["creativity"]
-githubUsername: 'Kiananasiri' , 'DEStinax'
----
+Hi there 👋🏻,
+This is my final project for our university course 'Database.' In this project, we created a database for a university website. You can check out our EER diagram in the repository, as well as a Python code that performs a basic GUI for it.
+
 
 
 **Languages We have used**
