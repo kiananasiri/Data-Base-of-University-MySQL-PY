@@ -1,29 +1,22 @@
 import sys
 import qtpy
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QMessageBox , QVBoxLayout, QStackedWidget
-from PyQt5.QtWidgets import  QTableWidget, QTableWidgetItem , QSizePolicy , QHeaderView , QHBoxLayout ,   QGraphicsDropShadowEffect
-from PyQt5.QtGui import QPalette, QColor, QCursor
-from PyQt5.QtGui import QPalette, QColor , QCursor , QFont, QPixmap , QBitmap , QPainter , QPainterPath
-
-from PyQt5 import QtCore 
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit, QGridLayout, QMessageBox, QVBoxLayout, QStackedWidget
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QSizePolicy, QHeaderView, QHBoxLayout, QGraphicsDropShadowEffect
+from PyQt5.QtGui import QPalette, QColor, QCursor, QFont, QPixmap, QBitmap, QPainter, QPainterPath
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 import mysql.connector
 from mysql.connector import Error
-
-
 
 def create_admin_page():
     admin_page = QWidget()
     admin_page.setWindowTitle("Admin Page")
     admin_page.setFixedSize(1380, 650)
-
     grid = QGridLayout()
     admin_page.setLayout(grid)
-
     palette = QPalette()
-    palette.setColor(QPalette.Window, QColor(200, 162, 200))  # lilac color
+    palette.setColor(QPalette.Window, QColor(200, 162, 200))
     admin_page.setPalette(palette)
-
     welcome_note = QLabel("Welcome, Admin!")
     welcome_note.setAlignment(Qt.AlignCenter)
     welcome_note.setStyleSheet(
@@ -31,12 +24,11 @@ def create_admin_page():
         font-size: 30px;
         color: purple;
         border: 2px solid black;
-        background-color: #FFC0CB;  # light pink background color
+        background-color: #FFC0CB;
         padding: 10px;
         '''
     )
     grid.addWidget(welcome_note, 0, 0, 1, 7)
-
     b1 = button_maker("Q1")
     grid.addWidget(b1, 1, 0)
     b1.clicked.connect(lambda: Q1())
@@ -58,7 +50,6 @@ def create_admin_page():
     b7 = button_maker("Q7")
     grid.addWidget(b7, 1, 6)
     b7.clicked.connect(lambda: Q7())
-
     return admin_page
 
 def button_maker(txt):
@@ -87,18 +78,18 @@ def button_maker(txt):
     return b
 
 def create_connection():
-        try:
-            conn = mysql.connector.connect(
-                host="localhost",
-                user="root",
-                password="bonjour1",
-                database="mydb"
-            )
-            if conn.is_connected():
-                return conn
-        except Error as e:
-            print(f"Error connecting to MySQL: {e}")
-            return None
+    try:
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="bonjour1",
+            database="mydb"
+        )
+        if conn.is_connected():
+            return conn
+    except Error as e:
+        print(f"Error connecting to MySQL: {e}")
+        return None
 
 def execute_query(query):
     conn = create_connection()
@@ -118,23 +109,14 @@ def execute_query(query):
 
 def Q1():
     query = '''
-        SELECT student_enrollment_stid FROM mydb.stsec
-        WHERE section_secid IN (SELECT secid FROM mydb.section
-                                WHERE year = YEAR(CURRENT_DATE()) AND semester = CASE 
-                                WHEN MONTH(CURRENT_DATE()) IN (9, 10, 11, 12, 1) THEN 1
-                                ELSE 2
-                                END)
+        Select ENROLLMENT_STID from student where ENROLLMENT_STID IN (select * from STSEC)
         '''
     rows = execute_query(query)
     for row in rows:
         print(row[0])
-            
     rows = execute_query(query)
-    
-    # Create a new widget to display query results
     result_page = QWidget()
     layout = QVBoxLayout(result_page)
-    
     title = QLabel("Query 1 Result")
     title.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
     title.setStyleSheet(
@@ -142,55 +124,32 @@ def Q1():
         font-size: 30px;
         color: purple;
         border: 2px solid black;
-        background-color: #FFC0CB;  /* light pink background color */
+        background-color: #FFC0CB;
         padding: 10px;
         '''
     )
     layout.addWidget(title)
-    
-    # Add a table to display the query results
     table = QTableWidget()
     table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
-    
-    # Adjusting the cell font
     table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
-    
     if rows:
         table.setRowCount(len(rows))
-        table.setColumnCount(1)  # Assuming only one column in the result for Q1
-        
-        # Fill the table with data
+        table.setColumnCount(1)
         for row_index, row_data in enumerate(rows):
             table.setItem(row_index, 0, QTableWidgetItem(str(row_data[0])))
-        
-        # Resize the columns to content
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        
-        # Set the size policy for the table
         table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         table.setMaximumSize(600, table.verticalHeader().defaultSectionSize() * len(rows) + 50)
-        
         layout.addWidget(table)
     else:
-        # Handle case where no data was found
         no_data_label = QLabel("No data found for Query 1.")
         no_data_label.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(no_data_label)
-    
-    # Add the widget to stacked widget or display directly
-    # You can add this widget to QStackedWidget or directly set as current widget
-    # self.stacked_widget.addWidget(result_page)
-    # self.stacked_widget.setCurrentWidget(result_page)
-    
     result_page.setLayout(layout)
-    result_page.show()  # Show the result page
-
-    # Alternatively, if using QStackedWidget
-    # self.stacked_widget.addWidget(result_page)
-    # self.stacked_widget.setCurrentWidget(result_page)
+    result_page.show()
 
 def Q2():
-        query = '''
+    query = '''
         SELECT course_coid FROM mydb.section AS s
         WHERE year = YEAR(CURRENT_DATE()) AND semester = CASE 
                                 WHEN MONTH(CURRENT_DATE()) IN (9, 10, 11, 12, 1) THEN 1
@@ -199,9 +158,9 @@ def Q2():
         AND 5 < (SELECT COUNT(student_enrollment_stid) FROM mydb.stsec
                 WHERE stsec.section_secid = s.secid)
         '''
-        rows = execute_query(query)
-        for row in rows:
-            print(row[0])
+    rows = execute_query(query)
+    for row in rows:
+        print(row[0])
 
 def Q3():
     query = '''
@@ -213,12 +172,9 @@ def Q3():
         '''
     rows = execute_query(query)
     for row in rows:
-            print(row)
-    
-    # Create a new widget to display query results
+        print(row)
     result_page = QWidget()
     layout = QVBoxLayout(result_page)
-    
     title = QLabel("Query 3 Result")
     title.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
     title.setStyleSheet(
@@ -226,124 +182,89 @@ def Q3():
         font-size: 30px;
         color: purple;
         border: 2px solid black;
-        background-color: #FFC0CB;  /* light pink background color */
+        background-color: #FFC0CB;
         padding: 10px;
         '''
     )
     layout.addWidget(title)
-    
-    # Add a table to display the query results
     table = QTableWidget()
     table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
-    
-    # Adjusting the cell font
     table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
-    
     rows = execute_query(query)
     if rows:
-        show_results_page(rows)  # Call function to show results
+        show_results_page(rows)
     else:
-        print("No results found.")  # Handle case where no rows are returned
+        print("No results found.")
 
 def show_results_page(rows):
-    # Create a new widget to display the results
     results_page = QWidget()
     layout = QVBoxLayout(results_page)
-
-    # Add widgets to display the results (e.g., QLabel, QTableWidget, etc.)
     result_label = QLabel("Results for Q3:")
     layout.addWidget(result_label)
-
-    # Example: Display results in a QTableWidget
     table = QTableWidget()
-    table.setColumnCount(1)  # Adjust column count as per your data
+    table.setColumnCount(1)
     table.setRowCount(len(rows))
-    table.setHorizontalHeaderLabels(["Student Enrollment ID"])  # Adjust header labels
-
+    table.setHorizontalHeaderLabels(["Student Enrollment ID"])
     for row_index, row in enumerate(rows):
         table.setItem(row_index, 0, QTableWidgetItem(str(row[0])))
-
     layout.addWidget(table)
-
-    # Add the layout to the widget
     results_page.setLayout(layout)
-
-    # Add results_page to stacked widget and set as current widget
     form.stacked_widget.addWidget(results_page)
     form.stacked_widget.setCurrentWidget(results_page)
-    # self.stacked_widget.setCurrentWidget(result_page)
-            
 
 def Q4():
-        query = '''
+    query = '''
         SELECT * FROM professor AS p
-        WHERE 70 < (SELECT SUM(credit) FROM course
+        WHERE 2 < (SELECT SUM(credit) FROM course
                     WHERE coid IN (SELECT course_coid FROM section
                                     WHERE section.professor_prof_id = p.prof_id))
         '''
-        rows = execute_query(query)
-        for row in rows:
-            print(row)
+    rows = execute_query(query)
+    for row in rows:
+        print(row)
 
 def Q5():
-        query = '''
+    query = '''
         SELECT book.name FROM book
         WHERE isbn IN (SELECT book_isbn FROM library_has_book AS lhb
                         WHERE 4 < (SELECT COUNT(DISTINCT student_enrollment_stid) FROM borrows
                                     WHERE borrows.library_has_book_bookid = lhb.bookid))
         '''
-        rows = execute_query(query)
-        for row in rows:
-            print(row)
+    rows = execute_query(query)
+    for row in rows:
+        print(row)
 
 def Q6():
-        query = '''
-        SELECT professor_prof_id, GROUP_CONCAT(schedule SEPARATOR "\\n") FROM section AS s
-        WHERE year = YEAR(CURRENT_DATE()) AND semester = CASE 
-                                WHEN MONTH(CURRENT_DATE()) IN (9, 10, 11, 12, 1) THEN 1
-                                ELSE 2
-                                END
-        AND 20 < (SELECT COUNT(student_enrollment_stid) FROM stsec
-                    WHERE s.secid = stsec.section_secid)
-        AND 3 <= (SELECT COUNT(course_coid) FROM section
-                    WHERE year = YEAR(CURRENT_DATE()) AND semester = CASE 
-                                WHEN MONTH(CURRENT_DATE()) IN (9, 10, 11, 12, 1) THEN 1
-                                ELSE 2
-                                END
-                    AND section.professor_prof_id = s.professor_prof_id)
-        GROUP BY professor_prof_id
+    query = '''
+        select secid from stsec where group by 
         '''
-        rows = execute_query(query)
-        for row in rows:
-            print(row)
+    rows = execute_query(query)
+    for row in rows:
+        print(row)
 
 def Q7():
-        query = '''
+    query = '''
         SELECT * FROM student
         WHERE enrollment_stid NOT IN (SELECT student_enrollment_stid FROM stsec)
         '''
-        rows = execute_query(query)
-        for row in rows:
-            print(row)
-            
+    rows = execute_query(query)
+    for row in rows:
+        print(row)
+
 class LoginForm(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Login Form')
         self.setFixedSize(1380, 650)
         
-        # Set the background color to lilac
         palette = QPalette()
-        palette.setColor(QPalette.Window, QColor(200, 162, 200))  # lilac color
+        palette.setColor(QPalette.Window, QColor(200, 162, 200))
         self.setPalette(palette)
         
-        # Create a stacked widget to hold different pages--------------------------------------
         self.stacked_widget = QStackedWidget(self)
         
-        # Login page widget --------------------------------------------------------------------------
         self.login_widget = QWidget()
         layout = QGridLayout(self.login_widget)
-
 
         label_name = QLabel('<font size="4"> Username </font>')
         self.lineEdit_username = QLineEdit()
@@ -370,27 +291,27 @@ class LoginForm(QWidget):
         button_student.setFixedWidth(170)
         button_professor.setFixedWidth(170)
         
-        button_student.setStyleSheet("border: 3px solid '#231942';" 
-                                     + 'border-radius: 10px;' 
-                                     + 'font-size: 15px;' 
-                                     + 'color: white;' 
-                                     + 'padding: 25x 0;' 
-                                     + 'margin: 15px 20px;}'
-                                     + "*:hover{background: '#5E548E';}")
-        button_professor.setStyleSheet("border: 3px solid '#231942';" 
-                                     + 'border-radius: 10px;' 
-                                     + 'font-size: 15px;' 
-                                     + 'color: white;' 
-                                     + 'padding: 25x 0;' 
-                                     + 'margin: 15px 20px;}'
-                                     + "*:hover{background: '#5E548E';}")
-        button_admin.setStyleSheet("border: 3px solid '#231942';" 
-                                     + 'border-radius: 10px;' 
-                                     + 'font-size: 15px;' 
-                                     + 'color: white;' 
-                                     + 'padding: 25x 0;' 
-                                     + 'margin: 15px 20px;}'
-                                     + "*:hover{background: '#5E548E';}")
+        button_student.setStyleSheet("border: 3px solid '#231942';"
+                                     'border-radius: 10px;'
+                                     'font-size: 15px;'
+                                     'color: white;'
+                                     'padding: 25x 0;'
+                                     'margin: 15px 20px;}'
+                                     "*:hover{background: '#5E548E';}")
+        button_professor.setStyleSheet("border: 3px solid '#231942';"
+                                     'border-radius: 10px;'
+                                     'font-size: 15px;'
+                                     'color: white;'
+                                     'padding: 25x 0;'
+                                     'margin: 15px 20px;}'
+                                     "*:hover{background: '#5E548E';}")
+        button_admin.setStyleSheet("border: 3px solid '#231942';"
+                                     'border-radius: 10px;'
+                                     'font-size: 15px;'
+                                     'color: white;'
+                                     'padding: 25x 0;'
+                                     'margin: 15px 20px;}'
+                                     "*:hover{background: '#5E548E';}")
         button_admin.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         button_student.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         button_professor.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
@@ -406,12 +327,9 @@ class LoginForm(QWidget):
 
         layout.setRowMinimumHeight(2, 75)
         
-        
-        # Add login widget to stacked widget
         self.stacked_widget.addWidget(self.login_widget)
         self.stacked_widget.setCurrentWidget(self.login_widget)
 
-        # Set layout for main window
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.stacked_widget)
         self.setLayout(main_layout)
@@ -435,15 +353,14 @@ class LoginForm(QWidget):
             return None
 
     def check_admin_password(self):
-
         username = 'admin'
-        password = '11'  # Replace with actual password retrieval logic
+        password = '11'
 
         if username == self.lineEdit_username.text() and password == self.lineEdit_password.text():
             msg = QMessageBox()
             msg.setText('Admin Login Successful')
             msg.exec_()
-            self.show_admin_page()  # Call the function to show admin page
+            self.show_admin_page()
         else:
             msg = QMessageBox()
             msg.setText('Incorrect Admin Username or Password')
@@ -453,7 +370,6 @@ class LoginForm(QWidget):
         admin_page = create_admin_page()
         self.stacked_widget.addWidget(admin_page)
         self.stacked_widget.setCurrentWidget(admin_page)
-        
         
     def check_student_password(self):
         connection = self.create_connection()
@@ -468,10 +384,7 @@ class LoginForm(QWidget):
             if result:
                 msg.setText('Student Login Successful')
                 msg.exec_()
-                # Perform further actions after successful login
                 self.login_action('STUDENT', result[0])
-                print(result[0])
-                
             else:
                 msg.setText('Incorrect Student Username')
                 msg.exec_()
@@ -489,19 +402,15 @@ class LoginForm(QWidget):
             if result:
                 msg.setText('Professor Login Successful')
                 msg.exec_()
-                # Perform further actions after successful login
                 self.login_action('PROFESSOR', result[0])
-                
             else:
                 msg.setText('Incorrect Professor Username')
                 msg.exec_()
 
     def login_action(self, user_type, user_id):
-    # Clear any previous pages from stacked widget
         while self.stacked_widget.count() > 1:
             self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
 
-        # Fetch user data from database based on user_type and user_id
         connection = self.create_connection()
         if connection:
             cursor = connection.cursor()
@@ -510,61 +419,44 @@ class LoginForm(QWidget):
             elif user_type == 'PROFESSOR':
                 query = "SELECT * FROM PROFESSOR WHERE PROF_ID = %s"
             cursor.execute(query, (user_id,))
-            result = cursor.fetchone()  # Assuming there's only one record for the ID
-
-            # Close the database connection
+            result = cursor.fetchone()
             connection.close()
 
             if result:
                 self.student_page(cursor, result) if user_type == 'STUDENT' else self.professor_page(cursor, result)
             else:
-                # Handle case where no data was found (though it shouldn't happen if login is successful)
                 msg = QMessageBox()
                 msg.setText('No data found for user ID.')
                 msg.exec_()
             
         else:
-            # Handle case where database connection failed
             msg = QMessageBox()
             msg.setText('Database connection failed.')
             msg.exec_()
 
     def student_page(self, cursor, result):
-        # Create a new widget to display user data
         user_page = QWidget()
         layout = QVBoxLayout(user_page)
 
-    
-        # Create a drop shadow effect
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(15)
         shadow.setOffset(5, 5)
-        shadow.setColor(QColor(136, 136, 136))  # Gray shadow color
+        shadow.setColor(QColor(136, 136, 136))
 
         image_label = QLabel()
-        pixmap = QPixmap("/Users/kiananasiri/Desktop/welcomestu.png") 
+        pixmap = QPixmap("/Users/kiananasiri/Desktop/welcomestu.png")
         image_label.setPixmap(pixmap)
         image_label.setAlignment(Qt.AlignCenter)
-        size = 200  
+        size = 200
         scaled_pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
         image_label.setPixmap(scaled_pixmap)
  
         layout.addWidget(image_label)
         self.setLayout(layout)
 
-
-
-        # Add a table to display the data
         table = QTableWidget()
         table.setStyleSheet("background-color: #d3d3d3 ; border: 2px solid #231942;")
-
-        
-        
-        
-        
-        # Adjusting the cell font
         table.horizontalHeader().setStyleSheet("font-size: 10px; color: black;")
-
         table.setHorizontalHeaderLabels(["STUDENTID", "NAME", "MAJOR", "TOTAL PASSED CREDIT", "LEVEL", "TERM", "STATE"])
     
         table.setRowCount(1)
@@ -572,30 +464,21 @@ class LoginForm(QWidget):
         table.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
         row_label = "STUDENT INFO"
         table.setVerticalHeaderLabels([row_label])
-        # Fill the table with data
         for col_index, col_value in enumerate(result):
             table.setItem(0, col_index, QTableWidgetItem(str(col_value)))
             
-        
-    # Resize the columns to content
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-
-    # Set the size policy for the table
         table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        table.setMaximumSize(600 , table.verticalHeader().defaultSectionSize() + 20)
+        table.setMaximumSize(600, table.verticalHeader().defaultSectionSize() + 20)
         
-# buttons book nad sec stsec hosetly 
-
-        # Add buttons to the student page
         table_widget = QWidget()
         table_layout = QVBoxLayout(table_widget)
         table_layout.addWidget(table)
-        table_layout.setAlignment(QtCore.Qt.AlignCenter)  
+        table_layout.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(table_widget, alignment=Qt.AlignCenter)
 
         layout.addWidget(table)
 
-        # Add buttons to the student page
         buttonstu_section = QPushButton('SECTION')
         buttonstu_book = QPushButton('BOOK')
         buttonstu_another = QPushButton('ANOTHER')
@@ -641,190 +524,144 @@ class LoginForm(QWidget):
                              "}")
         buttonstu_book.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
-        # Align buttons to the bottom-center
         button_widget = QWidget()
         button_widget.setLayout(button_layout)
         layout.addWidget(button_widget, alignment=QtCore.Qt.AlignBottom)
         
         buttonstu_section.clicked.connect(self.show_section_data)
-        buttonstu_book.clicked.connect(lambda: self.show_borrowed_books(result[0]))  # Assuming result[0] is the student ID
+        buttonstu_book.clicked.connect(lambda: self.show_borrowed_books(result[0]))
 
-    # Add student page widget to stacked widget
         self.stacked_widget.addWidget(user_page)
         self.stacked_widget.setCurrentWidget(user_page)
 
     
-    
     def show_section_data(self):
-        try:
-            connection = mysql.connector.connect(
-                host='localhost',
-                database='mydb',
-                user='root',
-                password='bonjour1'
-            )
-
-            
-            if connection:
-                cursor = connection.cursor()
-                query = """
-                    SELECT STSEC.* , SECTION.*
-                    FROM STSEC
-                    JOIN SECTION ON STSEC.SECTION_SECID = SECTION.SECID
-                    WHERE STSEC.STUDENT_ENROLLMENT_STID = %s
-                """
-                cursor.execute(query, (self.lineEdit_username.text(),))
-                results = cursor.fetchall()
-
-                # Close the database connection
-                connection.close()
-                
-
-                # Create a new widget to display section data
-                section_page = QWidget()
-                layout = QVBoxLayout(section_page)
-                
-                title = QLabel("Section Page")
-                title.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
-                title.setStyleSheet(
-        '''
-        font-size: 30px;
-        color: purple;
-        border: 2px solid black;
-        background-color: #FFC0CB;  /* light pink background color */
-        padding: 10px;
-        '''
-    )
-                title.setMaximumSize(700 , 80)
-                layout.addWidget(title)
-                section_page.setLayout(layout)
-                # Add a table to display the data
-                section_table = QTableWidget()
-                section_table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
-
-                # Adjusting the cell font
-                section_table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
-
-                if results:
-                    section_table.setRowCount(len(results))
-                    section_table.setColumnCount(len(results[0]))
-                    section_table.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
-
-                    # Fill the table with data
-                    for row_index, row_data in enumerate(results):
-                        for col_index, col_value in enumerate(row_data):
-                            section_table.setItem(row_index, col_index, QTableWidgetItem(str(col_value)))
-
-                    # Resize the columns to content
-                    section_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-
-                    # Set the size policy for the table
-                    section_table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                    section_table.setMaximumSize(1190, section_table.verticalHeader().defaultSectionSize() * len(results) + 50)
-
-                else:
-                    # Handle case where no data was found
-                    msg = QMessageBox()
-                    msg.setText('No section data found for the student.')
-                    msg.exec_()
-
-                layout.addWidget(section_table)
-                self.stacked_widget.addWidget(section_page)
-                self.stacked_widget.setCurrentWidget(section_page)
-
-               
-                
-
-        except Error as e:
-            print(f"Error retrieving data: {e}")
-            # Handle error, show message box or log error
-            
-    def show_borrowed_books(self, student_id):
-        connection = self.create_connection()
+    try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            database='mydb',
+            user='root',
+            password='bonjour1'
+        )
+        
         if connection:
             cursor = connection.cursor()
             query = """
-                SELECT BOOK.NAME , LIBRARY_has_BOOK.BOOK_ISBN , BORROWS.TAKE_DATE, BORROWS.RETURN_DATE
-                FROM BORROWS
-                JOIN LIBRARY_has_BOOK ON BORROWS.LIBRARY_has_BOOK_BOOKID = LIBRARY_has_BOOK.BOOKID
-                JOIN BOOK on LIBRARY_has_BOOK.BOOK_ISBN = BOOK.ISBN
-                WHERE BORROWS.STUDENT_ENROLLMENT_STID = %s
+                SELECT STSEC.*, SECTION.*
+                FROM STSEC
+                JOIN SECTION ON STSEC.SECTION_SECID = SECTION.SECID
+                WHERE STSEC.STUDENT_ENROLLMENT_STID = %s
             """
-            cursor.execute(query, (student_id,))
-            borrowed_books = cursor.fetchall()
+            cursor.execute(query, (self.lineEdit_username.text(),))
+            results = cursor.fetchall()
             connection.close()
-
-            # Display the borrowed books in a new table
-            borrowed_books_page = QWidget()
-            layout = QVBoxLayout(borrowed_books_page)
-
-            borrowed_books_table = QTableWidget()
-            borrowed_books_table.setStyleSheet("background-color: #9F86C0; border: 2px solid #231942;")
-            borrowed_books_table.setRowCount(len(borrowed_books))
-            borrowed_books_table.setColumnCount(4)
-            borrowed_books_table.setHorizontalHeaderLabels(["NAME", "BOOKID" , "BORROW DATE", "RETURN DATE"])
-
-            # Fill the table with borrowed books data
-            for row_index, row_data in enumerate(borrowed_books):
-                for col_index, col_value in enumerate(row_data):
-                    borrowed_books_table.setItem(row_index, col_index, QTableWidgetItem(str(col_value)))
-
-            borrowed_books_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-            borrowed_books_table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            borrowed_books_table.setMaximumSize(800, 400)  # Adjust as needed
-
-            layout.addWidget(borrowed_books_table)
-            self.stacked_widget.addWidget(borrowed_books_page)
-            self.stacked_widget.setCurrentWidget(borrowed_books_page)     
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-    def professor_page(self, cursor, result):
-         # Create a new widget to display user data
-        user_page = QWidget()
-        layout = QVBoxLayout(user_page)
-
-        # Add a table to display the data
-        table = QTableWidget()
-        table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
-
-        # Adjusting the cell font
-        table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
-
-        table.setHorizontalHeaderLabels(["PROF_ID" , "NAME" ,"SALARY" , "DEPARTMENT" , "PHONE"])
-    
-        table.setRowCount(1)
-        table.setColumnCount(len(result)-3)
-        table.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
-
-        # Fill the table with data
-        for col_index, col_value in enumerate(result):
-            table.setItem(0, col_index, QTableWidgetItem(str(col_value)))
             
-    # Resize the columns to content
-        table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+            section_page = QWidget()
+            layout = QVBoxLayout(section_page)
+            
+            title = QLabel("Section Page")
+            title.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
+            title.setStyleSheet('''
+                font-size: 30px;
+                color: black;
+                border: 2px solid black;
+                background-color: #CECECE;
+                padding: 10px;
+            ''')
+            title.setMaximumSize(700, 80)
+            layout.addWidget(title)
+            section_page.setLayout(layout)
 
-    # Set the size policy for the table
-        table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        table.setMaximumSize(620, table.verticalHeader().defaultSectionSize() + 50)
+            section_table = QTableWidget()
+            section_table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
+            section_table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
 
-        layout.addWidget(table)
-        self.stacked_widget.addWidget(user_page)
-        self.stacked_widget.setCurrentWidget(user_page)
+            if results:
+                section_table.setRowCount(len(results))
+                section_table.setColumnCount(len(results[0]))
+                section_table.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
+                
+                for row_index, row_data in enumerate(results):
+                    for col_index, col_value in enumerate(row_data):
+                        section_table.setItem(row_index, col_index, QTableWidgetItem(str(col_value)))
+                        
+                section_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+                section_table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                section_table.setMaximumSize(1190, section_table.verticalHeader().defaultSectionSize() * len(results) + 50)
+            else:
+                msg = QMessageBox()
+                msg.setText('No section data found for the student.')
+                msg.exec_()
+
+            layout.addWidget(section_table)
+            self.stacked_widget.addWidget(section_page)
+            self.stacked_widget.setCurrentWidget(section_page)
+
+    except Error as e:
+        print(f"Error retrieving data: {e}")
+
+def show_borrowed_books(self, student_id):
+    connection = self.create_connection()
+    if connection:
+        cursor = connection.cursor()
+        query = """
+            SELECT BOOK.NAME, LIBRARY_has_BOOK.BOOK_ISBN, BORROWS.TAKE_DATE, BORROWS.RETURN_DATE
+            FROM BORROWS
+            JOIN LIBRARY_has_BOOK ON BORROWS.LIBRARY_has_BOOK_BOOKID = LIBRARY_has_BOOK.BOOKID
+            JOIN BOOK on LIBRARY_has_BOOK.BOOK_ISBN = BOOK.ISBN
+            WHERE BORROWS.STUDENT_ENROLLMENT_STID = %s
+        """
+        cursor.execute(query, (student_id,))
+        borrowed_books = cursor.fetchall()
+        connection.close()
+
+        borrowed_books_page = QWidget()
+        layout = QVBoxLayout(borrowed_books_page)
+
+        borrowed_books_table = QTableWidget()
+        borrowed_books_table.setStyleSheet("background-color: #9F86C0; border: 2px solid #231942;")
+        borrowed_books_table.setRowCount(len(borrowed_books))
+        borrowed_books_table.setColumnCount(4)
+        borrowed_books_table.setHorizontalHeaderLabels(["NAME", "BOOKID", "BORROW DATE", "RETURN DATE"])
+
+        for row_index, row_data in enumerate(borrowed_books):
+            for col_index, col_value in enumerate(row_data):
+                borrowed_books_table.setItem(row_index, col_index, QTableWidgetItem(str(col_value)))
+
+        borrowed_books_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        borrowed_books_table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        borrowed_books_table.setMaximumSize(800, 400)
+
+        layout.addWidget(borrowed_books_table)
+        self.stacked_widget.addWidget(borrowed_books_page)
+        self.stacked_widget.setCurrentWidget(borrowed_books_page)
+
+def professor_page(self, cursor, result):
+    user_page = QWidget()
+    layout = QVBoxLayout(user_page)
+
+    table = QTableWidget()
+    table.setStyleSheet("background-color: #9F86C0; border: 3px solid #231942;")
+    table.horizontalHeader().setStyleSheet("font-size: 15px; color: white;")
+    table.setHorizontalHeaderLabels(["PROF_ID", "NAME", "SALARY", "DEPARTMENT", "PHONE"])
+
+    table.setRowCount(1)
+    table.setColumnCount(len(result) - 3)
+    table.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
+
+    for col_index, col_value in enumerate(result):
+        table.setItem(0, col_index, QTableWidgetItem(str(col_value)))
+
+    table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+    table.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+    table.setMaximumSize(620, table.verticalHeader().defaultSectionSize() + 50)
+
+    layout.addWidget(table)
+    self.stacked_widget.addWidget(user_page)
+    self.stacked_widget.setCurrentWidget(user_page)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     form = LoginForm()
     form.show()
     sys.exit(app.exec_())
-
