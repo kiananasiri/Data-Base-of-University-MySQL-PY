@@ -6,4 +6,6 @@ spoiler: University Data Base using MYSQLserver and python programming
 categories: ["creativity"]
 githubUsername: 'Kiananasiri' , 'DEStinax'
 ---
-[![Header](https://github.com/adamalston/adamalston/raw/master/profile.gif)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+**Languages We have used**
+![SQL](https://img.shields.io/badge/-SQL-000000?style=flat&logo=MySQL)
+![Python](https://img.shields.io/badge/-Python-000000?style=flat&logo=python)
