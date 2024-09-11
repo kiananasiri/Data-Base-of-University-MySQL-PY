@@ -1,7 +1,7 @@
 # Data-Base-of-University-SQL-PY
 
 Hi there 👋🏻,
-This is my final project for our university course 'Database.' In this project, we created a database for a university website. You can check out our EER diagram in the repository, as well as a Python code that performs a basic GUI for it.
+This is our final project for university course 'Database.' In this project, we created a MySql database for a university website. You can check out our EER diagram in the repository, as well as a Python code that performs a basic GUI for it.
 
 
 
